@@ -1,4 +1,3 @@
-
 import { useNavigate, useLocation } from "react-router-dom"
 import { Tabs, Tab, Box } from "@mui/material"
 import { Link as LinkIcon, BarChart as BarChartIcon } from "@mui/icons-material"

@@ -14,7 +14,7 @@ import {
 } from "@mui/icons-material"
 
 const URLInputCard = ({ url, index, onChange, errors, disabled }) => {
-  const handleExpandToggle = () => {
+  const toggleExpanded = () => {
     onChange(url.id, "expanded", !url.expanded)
   }
 
@@ -43,7 +43,7 @@ const URLInputCard = ({ url, index, onChange, errors, disabled }) => {
           <Tooltip title={url.expanded ? "Collapse" : "Expand"}>
             <IconButton 
               size="small" 
-              onClick={handleExpandToggle}
+              onClick={toggleExpanded}
               disabled={disabled}
             >
               {url.expanded ? <CollapseIcon /> : <ExpandIcon />}
@@ -64,7 +64,7 @@ const URLInputCard = ({ url, index, onChange, errors, disabled }) => {
         />
 
         <Collapse in={url.expanded}>
-          <Box sx={{ mt: 2, space: 2 }}>
+          <Box sx={{ mt: 2 }}>
             <TextField
               fullWidth
               label="Custom Shortcode (optional)"

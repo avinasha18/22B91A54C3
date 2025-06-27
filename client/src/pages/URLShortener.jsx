@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Card,
   CardContent,
@@ -40,15 +40,22 @@ const URLShortener = () => {
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
+  const resultsRef = useRef(null)
 
   useEffect(() => {
     Log("frontend", "info", "page", "URL Shortener page loaded")
   }, [])
 
   const handleInputChange = (id, field, value) => {
-    setUrls(prev => prev.map(url => url.id === id ? { ...url, [field]: value, expanded: field === "longURL" && value ? true : url.expanded } : url))
-    if (errors[`${id}-${field}`]) setErrors(prev => ({ ...prev, [`${id}-${field}`]: null }))
-    // Auto-add next card if last card is filled and not at max
+    setUrls(prev => prev.map(url => 
+      url.id === id ? { ...url, [field]: value, expanded: field === "longURL" && value ? true : url.expanded } : url
+    ))
+    
+    if (errors[`${id}-${field}`]) {
+      setErrors(prev => ({ ...prev, [`${id}-${field}`]: null }))
+    }
+    
+    // Add new card if last one is filled and under max limit
     if (field === "longURL" && value && id === urls[urls.length - 1].id && urls.length < MAX_CARDS) {
       setUrls(prev => [...prev, { id: prev.length + 1, longURL: "", shortcode: "", expiry: "", expanded: false }])
     }
@@ -57,22 +64,33 @@ const URLShortener = () => {
   const validateForm = () => {
     const newErrors = {}
     let hasValidUrl = false
+    
     urls.forEach(url => {
       if (url.longURL.trim()) {
         hasValidUrl = true
-        if (!validateURL(url.longURL)) newErrors[`${url.id}-longURL`] = "Invalid URL format"
-        if (url.expiry && (isNaN(url.expiry) || parseInt(url.expiry) <= 0)) newErrors[`${url.id}-expiry`] = "Invalid minutes"
+        if (!validateURL(url.longURL)) {
+          newErrors[`${url.id}-longURL`] = "Invalid URL format"
+        }
+        if (url.expiry && (isNaN(url.expiry) || parseInt(url.expiry) <= 0)) {
+          newErrors[`${url.id}-expiry`] = "Invalid minutes"
+        }
       }
     })
-    if (!hasValidUrl) newErrors.general = "Enter at least one URL to shorten"
+    
+    if (!hasValidUrl) {
+      newErrors.general = "Enter at least one URL to shorten"
+    }
+    
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = async () => {
     if (!validateForm()) return
+    
     setLoading(true)
     const newResults = []
+    
     try {
       for (const url of urls) {
         if (url.longURL.trim()) {
@@ -92,6 +110,17 @@ const URLShortener = () => {
         }
       }
       setResults(newResults)
+      
+      // Scroll to results section after a short delay
+      setTimeout(() => {
+        if (resultsRef.current) {
+          resultsRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          })
+        }
+      }, 100)
+      
     } catch (error) {
       Log("frontend", "fatal", "component", `Critical error: ${error.message}`)
     } finally {
@@ -131,11 +160,13 @@ const URLShortener = () => {
           Create up to 5 short URLs at once. You can add another URL by clicking the button below.
         </Typography>
       </Box>
+      
       <Card elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: 3, mb: 3 }}>
         <CardContent sx={{ p: 3 }}>
           {errors.general && (
             <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{errors.general}</Alert>
           )}
+          
           <Stack spacing={2} mb={3}>
             {urls.map((url, index) => (
               <URLInputCard
@@ -148,6 +179,7 @@ const URLShortener = () => {
               />
             ))}
           </Stack>
+          
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Button
               variant="outlined"
@@ -170,37 +202,50 @@ const URLShortener = () => {
               Clear
             </Button>
           </Box>
+          
           <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
             <Button
               variant="contained"
               size="large"
               onClick={handleSubmit}
               disabled={loading}
-              sx={{ bgcolor: '#000', color: 'white', px: 4, borderRadius: 2, textTransform: 'none', fontWeight: 600, '&:hover': { bgcolor: '#333' }, '&:disabled': { bgcolor: '#ccc' } }}
+              sx={{ 
+                bgcolor: '#000', 
+                color: 'white', 
+                px: 4, 
+                borderRadius: 2, 
+                textTransform: 'none', 
+                fontWeight: 600, 
+                '&:hover': { bgcolor: '#333' }, 
+                '&:disabled': { bgcolor: '#ccc' } 
+              }}
             >
               {loading ? <CircularProgress size={18} color="inherit" /> : <AddIcon sx={{ mr: 1 }} />} Create URLs
             </Button>
           </Box>
         </CardContent>
       </Card>
+      
       {results.length > 0 && (
-        <Fade in={true}>
-          <Card elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: 3 }}>
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: '#000', mb: 3 }}>
-                Generated URLs
-              </Typography>
-              <Stack spacing={2}>
-                {results.map((result, index) => (
-                  <Box key={result.id}>
-                    {index > 0 && <Divider sx={{ my: 2 }} />}
-                    <ResultItem result={result} onCopy={handleCopy} />
-                  </Box>
-                ))}
-              </Stack>
-            </CardContent>
-          </Card>
-        </Fade>
+        <div ref={resultsRef}>
+          <Fade in={true}>
+            <Card elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: 3 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#000', mb: 3 }}>
+                  Generated URLs
+                </Typography>
+                <Stack spacing={2}>
+                  {results.map((result, index) => (
+                    <Box key={result.id}>
+                      {index > 0 && <Divider sx={{ my: 2 }} />}
+                      <ResultItem result={result} onCopy={handleCopy} />
+                    </Box>
+                  ))}
+                </Stack>
+              </CardContent>
+            </Card>
+          </Fade>
+        </div>
       )}
     </Box>
   )

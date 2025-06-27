@@ -4,19 +4,20 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useState } from "react"
 
 const URLList = ({ urls, onSelect }) => {
-  const [copied, setCopied] = useState(null)
+  const [copiedShortcode, setCopiedShortcode] = useState(null)
 
-  const handleCopy = async (url, shortcode) => {
+  const copyUrl = async (url, shortcode) => {
     try {
       await navigator.clipboard.writeText(url)
-      setCopied(shortcode)
-      setTimeout(() => setCopied(null), 1200)
+      setCopiedShortcode(shortcode)
+      setTimeout(() => setCopiedShortcode(null), 1200)
     } catch {}
   }
 
   if (!urls.length) {
     return <Typography color="text.secondary">No URLs found.</Typography>
   }
+
   return (
     <Box sx={{ bgcolor: "#fafafa", borderRadius: 2, boxShadow: 1, p: 2 }}>
       <List>
@@ -26,8 +27,8 @@ const URLList = ({ urls, onSelect }) => {
               disablePadding
               secondaryAction={
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  <Tooltip title={copied === url.shortcode ? "Copied!" : "Copy link"}>
-                    <IconButton edge="end" onClick={() => handleCopy(url.shortURL, url.shortcode)}>
+                  <Tooltip title={copiedShortcode === url.shortcode ? "Copied!" : "Copy link"}>
+                    <IconButton edge="end" onClick={() => copyUrl(url.shortURL, url.shortcode)}>
                       <ContentCopyIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>

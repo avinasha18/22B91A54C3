@@ -2,5 +2,9 @@
   "name": "shared",
   "version": "1.0.0",
   "type": "module",
-  "description": "Shared utilities for URL shortener"
-} 
+  "description": "Shared utilities for URL shortener",
+  "dependencies": {
+    "dotenv": "^16.6.0",
+    "node-fetch": "^3.3.2"
+  }
+}

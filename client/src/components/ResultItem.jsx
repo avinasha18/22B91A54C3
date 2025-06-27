@@ -1,7 +1,6 @@
 import {
   Box,
   Typography,
-  Button,
   IconButton,
   Tooltip,
   Alert,
@@ -17,7 +16,7 @@ import { useState } from "react"
 const ResultItem = ({ result, onCopy }) => {
   const [copied, setCopied] = useState(false)
 
-  const handleCopy = async () => {
+  const copyToClipboard = async () => {
     if (result.error) return
     
     try {
@@ -29,7 +28,7 @@ const ResultItem = ({ result, onCopy }) => {
     }
   }
 
-  const handleOpen = () => {
+  const openInNewTab = () => {
     if (result.error) return
     window.open(result.shortURL, "_blank", "noopener,noreferrer")
   }
@@ -96,7 +95,7 @@ const ResultItem = ({ result, onCopy }) => {
           <Tooltip title={copied ? "Copied!" : "Copy URL"}>
             <IconButton 
               size="small" 
-              onClick={handleCopy}
+              onClick={copyToClipboard}
               sx={{ 
                 bgcolor: copied ? '#4caf50' : '#fff',
                 color: copied ? '#fff' : '#666',
@@ -113,7 +112,7 @@ const ResultItem = ({ result, onCopy }) => {
           <Tooltip title="Open URL">
             <IconButton 
               size="small" 
-              onClick={handleOpen}
+              onClick={openInNewTab}
               sx={{ 
                 bgcolor: '#fff',
                 color: '#666',

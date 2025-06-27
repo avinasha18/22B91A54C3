@@ -10,9 +10,11 @@ const URLStatsModal = ({ shortcode, onClose }) => {
 
   useEffect(() => {
     if (!shortcode) return
+    
     setLoading(true)
     setError(null)
     setStats(null)
+    
     getSingleURLStats(shortcode)
       .then(setStats)
       .catch((e) => setError(e.message))
@@ -24,6 +26,7 @@ const URLStatsModal = ({ shortcode, onClose }) => {
       <IconButton onClick={onClose} sx={{ position: "absolute", top: 8, right: 8 }}>
         <CloseIcon />
       </IconButton>
+      
       {loading ? (
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
           <CircularProgress />
@@ -39,12 +42,15 @@ const URLStatsModal = ({ shortcode, onClose }) => {
             Original: {stats.longURL}
           </Typography>
           <Divider sx={{ mb: 2 }} />
+          
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <Typography variant="body2">Clicks: <b>{stats.clicks}</b></Typography>
             <Typography variant="body2">Created: <b>{new Date(stats.createdAt).toLocaleString()}</b></Typography>
             <Typography variant="body2">Expires: <b>{new Date(stats.expiryTime).toLocaleString()}</b></Typography>
           </Box>
+          
           <Divider sx={{ mb: 2 }} />
+          
           <Typography variant="subtitle1" sx={{ mb: 1 }}>Click History</Typography>
           {stats.clickLogs && stats.clickLogs.length > 0 ? (
             <TableContainer component={Paper} sx={{ mb: 1 }}>
@@ -72,6 +78,7 @@ const URLStatsModal = ({ shortcode, onClose }) => {
           )}
         </Box>
       ) : null}
+      
       <Box display="flex" justifyContent="flex-end" mt={2}>
         <Button onClick={onClose} variant="outlined">Close</Button>
       </Box>

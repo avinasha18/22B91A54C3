@@ -21,6 +21,7 @@ const StatisticsPage = () => {
   const fetchURLs = async () => {
     setLoading(true)
     setError(null)
+    
     try {
       const urls = await getAllURLs()
       setUrls(urls)
@@ -36,7 +37,7 @@ const StatisticsPage = () => {
     setModalOpen(true)
   }
 
-  const handleCloseModal = () => {
+  const closeModal = () => {
     setModalOpen(false)
     setSelectedShortcode(null)
   }
@@ -57,7 +58,9 @@ const StatisticsPage = () => {
           Refresh
         </Button>
       </Box>
+      
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      
       {loading ? (
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
           <CircularProgress />
@@ -67,8 +70,9 @@ const StatisticsPage = () => {
           <URLList urls={urls} onSelect={handleSelect} />
         </Box>
       )}
-      <Dialog open={modalOpen} onClose={handleCloseModal} maxWidth="md" fullWidth>
-        <URLStatsModal shortcode={selectedShortcode} onClose={handleCloseModal} />
+      
+      <Dialog open={modalOpen} onClose={closeModal} maxWidth="md" fullWidth>
+        <URLStatsModal shortcode={selectedShortcode} onClose={closeModal} />
       </Dialog>
     </Container>
   )
